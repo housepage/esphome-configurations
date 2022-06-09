@@ -1,0 +1,65 @@
+# ESP32 NodeMCU
+esphome:
+  name: bed-sensor
+esp32:
+  board: esp32doit-devkit-v1
+  framework:
+    type: arduino
+wifi:
+  ssid: Lights
+  password: GlowBrightly
+  ap:
+    ssid: "Bed Sensor Fallback Hotspot"
+    password: "SensorsFail"
+    
+# Fallback portal 
+#captive_portal:
+  
+# Logging
+logger:
+
+#api:
+#  password: "change_this_please!"
+# Fill your MQTT information
+# Delete this if you're using Home Assistant
+mqtt:
+  broker: "192.168.50.52"
+  username: "bed_sensor"
+  password: "bedsensor"
+ota:
+  password: "ForestFortUpdates" 
+esp32_touch:
+   setup_mode: true 
+# All the pressure mats
+binary_sensor:
+   - platform: esp32_touch
+     name: "Top Right"
+     pin: GPIO14
+     threshold: 4
+     id: top_right
+   - platform: esp32_touch
+     name: "Bottom Left"
+     pin: GPIO13
+     threshold: 6
+     id: bottom_left
+   - platform: esp32_touch
+     name: "Top Left"
+     pin: GPIO12
+     threshold: 6
+     id: top_left
+   - platform: esp32_touch
+     name: "Bottom Right"
+     pin: GPIO27
+     threshold: 4
+     id: bottom_right
+   - platform: template
+     name: "Bed Sensor"
+     lambda: |-
+       if (id(top_right).state ||
+           id(top_left).state ||
+           id(bottom_right).state ||
+           id(bottom_left).state) {
+         return true;
+       } else {
+         return false;
+       }
